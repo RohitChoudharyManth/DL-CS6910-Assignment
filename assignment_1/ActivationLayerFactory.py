@@ -10,3 +10,9 @@ def tanh(x):
 
 def tanh_d(x):
     return 1-np.tanh(x)**2
+
+def sigmoid(x):
+    return np.divide(1, (1+np.exp(-x)))
+
+def sigmoid_d(x):
+    return np.multiply(sigmoid(x), 1- sigmoid(x))

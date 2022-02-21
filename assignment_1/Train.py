@@ -1,5 +1,5 @@
 from assignment_1.ActivationLayer import ActivationLayer
-from assignment_1.ActivationLayerFactory import tanh, tanh_d, relu, relu_d
+from assignment_1.ActivationLayerFactory import tanh, tanh_d, sigmoid, sigmoid_d
 from assignment_1.Dense import Dense
 from assignment_1.LossFactory import mse, mse_prime
 from assignment_1.Network import Network
@@ -33,11 +33,11 @@ nw = Network()
 optimizer = Optimizer(learning_rate=0.1, optimizer='SGD')
 nw.use(mse, mse_prime, optimizer)
 nw.add(Dense(28*28, 100))
-nw.add(ActivationLayer(tanh, tanh_d))
+nw.add(ActivationLayer(sigmoid, sigmoid_d))
 nw.add(Dense(100, 50))
-nw.add(ActivationLayer(tanh, tanh_d))
+nw.add(ActivationLayer(sigmoid, sigmoid_d))
 nw.add(Dense(50, 10))
-nw.add(ActivationLayer(tanh, tanh_d))
+nw.add(ActivationLayer(sigmoid, sigmoid_d))
 
 nw.fit(x_train[:1000], y_train[:1000], epochs=100)
 
