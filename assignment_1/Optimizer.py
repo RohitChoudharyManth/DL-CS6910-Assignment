@@ -1,3 +1,8 @@
+'''
+Optimizer class, implement all the optimizers as methods of this class and add it in the select list
+'''
+
+
 class Optimizer:
     def __init__(self, learning_rate, optimizer='SGD'):
         self.lr = learning_rate
