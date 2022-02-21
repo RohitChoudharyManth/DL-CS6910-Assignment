@@ -1,4 +1,7 @@
+import numpy as np
+
 from assignment_1.Optimizer import Optimizer
+from sklearn.metrics import accuracy_score
 
 
 class Network:
@@ -30,12 +33,13 @@ class Network:
             output = input_data[i]
             for layer in self.layers:
                 output = layer.forward(output)
-            result.append(output)
-
-        return result
+            np.argmax(output)
+            result.append(np.argmax(output))
+        op_arr = np.asarray(result)
+        return op_arr
 
     # train the network
-    def fit(self, x_train, y_train, epochs):
+    def fit(self, x_train, y_train, x_test, y_test, epochs):
         # sample dimension first
         samples = len(x_train)
 
@@ -60,3 +64,10 @@ class Network:
             # calculate average error on all samples
             err /= samples
             print('epoch %d/%d   error=%f' % (i+1, epochs, err))
+            y_pred_train = self.predict(x_train)
+            train_acc = accuracy_score(np.squeeze(np.argmax(y_train, axis=1)), np.squeeze(y_pred_train))
+            print('epoch %d/%d   train_accuracy=%f' % (i + 1, epochs, train_acc))
+
+            y_pred_test = self.predict(x_test)
+            test_acc = accuracy_score(np.squeeze(np.argmax(y_test, axis=1)), np.squeeze(y_pred_test))
+            print('epoch %d/%d   train_accuracy=%f' % (i + 1, epochs, test_acc))
