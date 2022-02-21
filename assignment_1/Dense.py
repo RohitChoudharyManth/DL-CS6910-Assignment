@@ -24,10 +24,5 @@ class Dense(BaseLayer):
         inp_error = np.dot(output_error, self.W.T)
         weights_error = np.dot(self.input.T, output_error)
         bias_error = output_error
-        self.W, self.B = optimizer.SGD_optim(copy.deepcopy(self.W), copy.deepcopy(self.B), weights_error, bias_error)
-
-
-
-
-
-
+        self.W, self.B = optimizer.optimizer(copy.deepcopy(self.W), copy.deepcopy(self.B), weights_error, bias_error)
+        return inp_error
