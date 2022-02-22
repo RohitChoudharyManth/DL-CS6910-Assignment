@@ -9,19 +9,25 @@ class Network:
         self.layers = []
         self.loss = None
         self.loss_prime = None
-        self.optimizer = None
+        self.w_optimizer = None
+        self.b_optimizer = None
 
     # add layer to network
     def add(self, layer):
         self.layers.append(layer)
 
     # set loss to use
-    def use(self, loss, loss_prime, optimizer : Optimizer):
+    def use(self, loss, loss_prime, optimizer='SGD', learning_rate = 1e-2, gamma = 0.9,
+            epsilon = 1e-8, beta1=0.9, beta2=0.999):
         self.loss = loss
         self.loss_prime = loss_prime
-        self.optimizer = optimizer
+        self.w_optimizer = Optimizer(optimizer=optimizer, learning_rate=learning_rate, gamma=gamma,
+                                     epsilon=epsilon, beta1=beta1, beta2=beta2)
+        self.b_optimizer = Optimizer(optimizer=optimizer, learning_rate=learning_rate, gamma=gamma,
+                                     epsilon=epsilon, beta1=beta1, beta2=beta2)
 
-    # predict output for given input
+
+        # predict output for given input
     def predict(self, input_data):
         # sample dimension first
         samples = len(input_data)
@@ -58,7 +64,7 @@ class Network:
                 # backward propagation
                 error = self.loss_prime(y_train[j], output)
                 for layer in reversed(self.layers):
-                    error = layer.backward(error, self.optimizer)
+                    error = layer.backward(error, self.w_optimizer, self.b_optimizer)
                     # pass
 
             # calculate average error on all samples

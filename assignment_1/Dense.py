@@ -1,6 +1,7 @@
 import numpy as np
 import copy
 from assignment_1.BaseLayer import BaseLayer
+from assignment_1.LayerHistory import LayerHistory
 from assignment_1.Optimizer import Optimizer
 from assignment_1.WeightInitializer import WeightInitializer
 
@@ -15,6 +16,9 @@ class Dense(BaseLayer):
         super(Dense, self).__init__()
         self.W = WeightInitializer().get_initial_weights(input_size, output_size, initializer_type='random')
         self.B = WeightInitializer().get_initial_bias(input_size, output_size, initializer_type='random')
+        self.W_history = LayerHistory()
+        self.B_history = LayerHistory()
+
 
     def forward(self, input):
         self.input = copy.deepcopy(input)
@@ -22,12 +26,10 @@ class Dense(BaseLayer):
         return copy.deepcopy(self.output)
 
 
-    def backward(self, output_error, optimizer):
+    def backward(self, output_error, w_optimizer, b_optimizer):
         inp_error = np.dot(output_error, self.W.T)
         weights_error = np.dot(self.input.T, output_error)
         bias_error = output_error
-        self.W = optimizer.optimizer(copy.deepcopy(self.W), weights_error)
-        self.B = optimizer.optimizer(copy.deepcopy(self.B), bias_error)
-
-
+        self.W, self.W_history = w_optimizer.optimizer(copy.deepcopy(self.W), weights_error, self.W_history)
+        self.B, self.B_history = b_optimizer.optimizer(copy.deepcopy(self.B), bias_error, self.B_history)
         return inp_error

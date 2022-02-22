@@ -17,5 +17,5 @@ class ActivationLayerVector(BaseLayer):
         self.output = self.activation(input)
         return self.output
 
-    def backward(self, output_error, optimizer):
+    def backward(self, output_error, w_optimizer, b_optimizer):
         return np.multiply(output_error, self.activation_d(self.input, self.output))
