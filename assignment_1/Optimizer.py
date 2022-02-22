@@ -30,14 +30,22 @@ class Optimizer:
             print('Give correct optimizer name')
             raise Exception
 
-    def SGD_optim(self, W, B, W_error, B_error):
-        W -= self.lr*W_error
-        B -= self.lr * B_error
-        return W, B
+    # def SGD_optim(self, W, B, W_error, B_error):
+    #    W -= self.lr * W_error
+    #    B -= self.lr * B_error
+    #    return W, B
 
-    def momentum_optim(self, W, B, W_error, B_error):
-        self.update = self.gamma * self.update + self.lr * W_error
-        W -= self.update
-        # Similarly
-        B -= self.gamma * self.update + self.lr * B_error
-        return W, B
+    def SGD_optim(self, param, param_grad):
+        param -= self.lr * param_grad
+        return param
+
+    def momentum_optim(self, param, param_grad):
+        self.update = self.gamma * self.update + self.lr * param_grad
+        param -= self.update
+        return param
+
+    def nesterov_optim(self, param, param_grad):
+        param_lookahead = param - self.gamma * self.update
+        self.update = self.gamma * self.update + self.lr *  ##### take gradient of param_lookahead
+        param -= self.update
+        return param
