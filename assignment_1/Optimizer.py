@@ -42,11 +42,11 @@ class Optimizer:
         param -= self.update
         return param
 
-    def nesterov_optim(self, param, param_grad):
-        param_lookahead = param - self.gamma * self.update
-        self.update = self.gamma * self.update + self.lr *  ##### take gradient of param_lookahead
-        param -= self.update
-        return param
+    # def nesterov_optim(self, param, param_grad):
+    #     param_lookahead = param - self.gamma * self.update
+    #     self.update = self.gamma * self.update + self.lr * param_grad  ##### take gradient of param_lookahead
+    #     param -= self.update
+    #     return param
 
     def rmsprop_optim(self, param, param_grad):
         self.v = self.beta1 * self.v + (1 - self.beta1) * (param_grad**2)
