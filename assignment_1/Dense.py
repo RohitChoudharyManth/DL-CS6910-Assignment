@@ -10,7 +10,7 @@ Initialize this class with Dense(input_size, output_size)
 input_size :- refers to the number of neurons in the previous layer.
 output_size :- refers to the number of neurons in this Dense layer
 '''
-
+import numpy as np
 class Dense(BaseLayer):
     def __init__(self, input_size, output_size):
         super(Dense, self).__init__()
@@ -18,6 +18,8 @@ class Dense(BaseLayer):
         self.B = WeightInitializer().get_initial_bias(input_size, output_size, initializer_type='random')
         self.W_history = LayerHistory()
         self.B_history = LayerHistory()
+        self.weights_error = []
+        self.bias_error = []
 
 
     def forward(self, input):
@@ -26,10 +28,13 @@ class Dense(BaseLayer):
         return copy.deepcopy(self.output)
 
 
-    def backward(self, output_error, w_optimizer, b_optimizer):
+    def backward(self, output_error, w_optimizer, b_optimizer, flag):
         inp_error = np.dot(output_error, self.W.T)
-        weights_error = np.dot(self.input.T, output_error)
-        bias_error = output_error
-        self.W, self.W_history = w_optimizer.optimizer(copy.deepcopy(self.W), weights_error, self.W_history)
-        self.B, self.B_history = b_optimizer.optimizer(copy.deepcopy(self.B), bias_error, self.B_history)
+        self.weights_error.append([np.dot(self.input.T, output_error)])
+        self.bias_error.append(output_error)
+        if flag == 1:
+            self.weights_error =np.mean(self.weights_error)
+            self.bias_error = np.mean(self.bias_error)
+            self.W, self.W_history = w_optimizer.optimizer(copy.deepcopy(self.W), self.weights_error, self.W_history)
+            self.B, self.B_history = b_optimizer.optimizer(copy.deepcopy(self.B), self.bias_error, self.B_history)
         return inp_error
