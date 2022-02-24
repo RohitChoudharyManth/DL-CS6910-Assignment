@@ -63,7 +63,8 @@ class Network:
                 y_train_batch = y_train[n * batch_size: (n + 1) * batch_size]
                 samples = len(x_train_batch)
 
-
+                # the idea is to set a flag = 1 when one batch ends
+                num_of_points_seen = 0
                 for j in range(samples):
                     # forward propagation
 
@@ -74,9 +75,6 @@ class Network:
 
                     # compute loss (for display purpose only)
                     err += self.loss(y_train_batch[j], output)
-
-                    #the idea is to set a flag = 1 when one batch ends
-                    num_of_points_seen = 0
 
                     if num_of_points_seen % batch_size ==0 :
                         flag = 1
@@ -91,9 +89,11 @@ class Network:
                         if layer_index % 2 ==0 :
                             error = layer.backward(error, self.w_optimizer, self.b_optimizer)
                         else:
-                            error = layer.backward(error, self.w_optimizer, self.b_optimizer)
+                            error = layer.backward(error, self.w_optimizer, self.b_optimizer, flag)
 
                         layer_index = layer_index + 1
+
+                    num_of_points_seen += 1
                     # pass
 
             # calculate average error on all samples
