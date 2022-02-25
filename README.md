@@ -7,8 +7,9 @@ Scratch code for Feed Forward Neural Network
 ## Description of Files
 1. To implement results along with wandb compilation wandb_run_assignment_1.ipynb"
 2. To replicate results with different configurations refer "assignment_1/Train.py"
+3. "Question_1_and_confusion_matrix.py" contains code to generate the image deck for Question 1 and the confusion matrix for the best performing model.
 
-### Assignment_1(with wandb)
+### wandb_run_assignment_1.ipynb(with wandb)
 Here sweep configuration (.yaml file) is setted up, you all just need to provide wandb login key and if you want change sweep configuration edit this section:
 ```
 The default sweep config is set to
