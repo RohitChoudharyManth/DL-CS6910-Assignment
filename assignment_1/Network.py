@@ -1,4 +1,5 @@
 import numpy as np
+from tqdm import tqdm
 
 from assignment_1.Optimizer import Optimizer
 from sklearn.metrics import accuracy_score
@@ -45,27 +46,33 @@ class Network:
         return op_arr
 
     # train the network
-    def fit(self, x_train, y_train, x_test, y_test, epochs):
+    def fit(self, x_train, y_train, x_test, y_test, epochs, batch_size=128):
         # sample dimension first
         samples = len(x_train)
 
         # training loop
         for i in range(epochs):
             err = 0
-            for j in range(samples):
+            for j in tqdm(range(samples)):
                 # forward propagation
                 output = x_train[j]
+                op = y_train[j]
                 for layer in self.layers:
                     output = layer.forward(output)
-
+                # print(output, op)
                 # compute loss (for display purpose only)
                 err += self.loss(y_train[j], output)
-
                 # backward propagation
                 error = self.loss_prime(y_train[j], output)
                 for layer in reversed(self.layers):
                     error = layer.backward(error, self.w_optimizer, self.b_optimizer)
-                    # pass
+                        # pass
+                    # error = 0
+
+                if j%batch_size == 0:
+                    # print('Batch Update', j)
+                    for layer in self.layers:
+                        layer.step(self.w_optimizer, self.b_optimizer)
 
             # calculate average error on all samples
             err /= samples

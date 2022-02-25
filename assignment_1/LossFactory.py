@@ -9,9 +9,9 @@ def mse_prime(y_true, y_pred):
     return 2*(y_pred-y_true)/y_true.size
 
 
-def cross_entropy(y_true, y_pred, eps=1e-5):
-    return (np.where(y_true == 1, -np.log(y_pred), 0)).sum(axis=1)
+def cross_entropy(y_true, y_pred, eps=1e-8):
+    return np.where(y_true == 1, -np.log2(eps + y_pred)/y_true.size, 0).sum()
 
-def cross_entropy_d(y_true, y_pred, eps=1e-5):
+def cross_entropy_d(y_true, y_pred, eps=1e-8):
     return np.where(y_true == 1, -1/(eps+y_pred), 0)
 

@@ -31,16 +31,16 @@ y_test_cat = to_categorical(y_test)
 
 # Network
 nw = Network()
-nw.use(cross_entropy, cross_entropy_d, optimizer='adam', learning_rate=0.001)
-nw.add(Dense(28*28, 256))
-nw.add(ActivationLayerScalar(sigmoid, sigmoid_d))
-nw.add(Dense(256, 64))
-nw.add(ActivationLayerScalar(sigmoid, sigmoid_d))
-nw.add(Dense(64, 10))
+nw.use(mse, mse_prime, optimizer='SGD', learning_rate=0.1)
+nw.add(Dense(28*28, 100))
+nw.add(ActivationLayerScalar(tanh, tanh_d))
+nw.add(Dense(100, 50))
+nw.add(ActivationLayerScalar(tanh, tanh_d))
+nw.add(Dense(50, 10))
 nw.add(ActivationLayerVector(softmax, softmax_d))
 
 
-nw.fit(x_train[:100], y_train[:100], x_test, y_test_cat, epochs=100)
+nw.fit(x_train, y_train, x_test, y_test_cat, epochs=100, batch_size=32)
 
 
 out = nw.predict(x_test[0:3])

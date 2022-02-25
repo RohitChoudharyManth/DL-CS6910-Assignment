@@ -9,3 +9,6 @@ class BaseLayer:
 
     def backward(self):
         raise NotImplementedError
+
+    def step(self,  w_optimizer, b_optimizer):
+        pass

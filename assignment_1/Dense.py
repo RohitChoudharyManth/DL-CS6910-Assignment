@@ -12,12 +12,14 @@ output_size :- refers to the number of neurons in this Dense layer
 '''
 
 class Dense(BaseLayer):
-    def __init__(self, input_size, output_size):
+    def __init__(self, input_size, output_size, initializer_type='random'):
         super(Dense, self).__init__()
-        self.W = WeightInitializer().get_initial_weights(input_size, output_size, initializer_type='random')
-        self.B = WeightInitializer().get_initial_bias(input_size, output_size, initializer_type='random')
+        self.W = WeightInitializer().get_initial_weights(input_size, output_size, initializer_type=initializer_type)
+        self.B = WeightInitializer().get_initial_bias(input_size, output_size, initializer_type=initializer_type)
         self.W_history = LayerHistory()
         self.B_history = LayerHistory()
+        self.weights_error_list = []
+        self.bias_error_list = []
 
 
     def forward(self, input):
@@ -30,6 +32,14 @@ class Dense(BaseLayer):
         inp_error = np.dot(output_error, self.W.T)
         weights_error = np.dot(self.input.T, output_error)
         bias_error = output_error
-        self.W, self.W_history = w_optimizer.optimizer(copy.deepcopy(self.W), weights_error, self.W_history)
-        self.B, self.B_history = b_optimizer.optimizer(copy.deepcopy(self.B), bias_error, self.B_history)
+        self.weights_error_list.append(weights_error)
+        self.bias_error_list.append(bias_error)
         return inp_error
+
+    def step(self, w_optimizer, b_optimizer):
+        average_batch_weight_error = np.mean(np.asarray(self.weights_error_list, dtype=np.float32), axis=0)
+        average_batch_bias_error = np.mean(np.asarray(self.bias_error_list, dtype=np.float32), axis=0)
+        self.W, self.W_history = w_optimizer.optimizer(copy.deepcopy(self.W), average_batch_weight_error, self.W_history)
+        self.B, self.B_history = b_optimizer.optimizer(copy.deepcopy(self.B), average_batch_bias_error, self.B_history)
+        self.weights_error_list.clear()
+        self.bias_error_list.clear()
