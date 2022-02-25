@@ -75,6 +75,46 @@ nw.fit(x_train, y_train, x_test, y_test_cat, epochs=5, batch_size=128)
 
 One can add as many layers as they want, Please note structure of Dense layer is as follows Dense(input_neuron_size, output_neuron_size)
 
+Note:- One cad add new layers as well, all layers inherit the BaseLayer class. Each layer class should implement forward, backward and step methods.
+As an example below is a snippet for the Dense class
+
+```
+class Dense(BaseLayer):
+    def __init__(self, input_size, output_size, initializer_type='random'):
+        super(Dense, self).__init__()
+        self.W = WeightInitializer().get_initial_weights(input_size, output_size, initializer_type=initializer_type)
+        self.B = WeightInitializer().get_initial_bias(input_size, output_size, initializer_type=initializer_type)
+        self.W_history = LayerHistory()
+        self.B_history = LayerHistory()
+        self.weights_error_list = []
+        self.bias_error_list = []
+
+
+    def forward(self, input):
+        self.input = copy.deepcopy(input)
+        self.output = np.matmul(self.input, self.W) + self.B
+        return copy.deepcopy(self.output)
+
+
+    def backward(self, output_error, w_optimizer, b_optimizer):
+        inp_error = np.dot(output_error, self.W.T)
+        weights_error = np.dot(self.input.T, output_error)
+        bias_error = output_error
+        self.weights_error_list.append(weights_error)
+        self.bias_error_list.append(bias_error)
+        return inp_error
+
+    def step(self, w_optimizer, b_optimizer):
+        average_batch_weight_error = np.mean(np.asarray(self.weights_error_list, dtype=np.float32), axis=0)
+        average_batch_bias_error = np.mean(np.asarray(self.bias_error_list, dtype=np.float32), axis=0)
+        self.W, self.W_history = w_optimizer.optimizer(copy.deepcopy(self.W), average_batch_weight_error, self.W_history)
+        self.B, self.B_history = b_optimizer.optimizer(copy.deepcopy(self.B), average_batch_bias_error, self.B_history)
+        self.weights_error_list.clear()
+        self.bias_error_list.clear()
+```
+
+
+
 Here input_neuron_size refers to the neurons in the previous layer, while output neuron size refers to the neurons in the current layer.
 Activation function can be changed in the ActivationLayerScalar, by giving either of 'sigmoid', 'tanh', 'relu' options.
 
