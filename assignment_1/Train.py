@@ -1,3 +1,5 @@
+from sklearn.metrics import accuracy_score
+
 from assignment_1.ActivationLayerScalar import ActivationLayerScalar
 from assignment_1.ActivationLayerFactory import tanh, tanh_d, sigmoid, sigmoid_d, softmax, softmax_d, relu, relu_d
 from assignment_1.ActivationLayerVector import ActivationLayerVector
@@ -8,7 +10,6 @@ import numpy as np
 from tensorflow.keras.datasets import fashion_mnist as mnist
 from tensorflow.keras.utils import to_categorical
 
-from assignment_1.Optimizer import Optimizer
 
 (x_train, y_train), (x_test, y_test) = mnist.load_data()
 
@@ -31,21 +32,20 @@ y_test_cat = to_categorical(y_test)
 
 # Network
 nw = Network()
-nw.use(mse, mse_prime, optimizer='SGD', learning_rate=0.1)
-nw.add(Dense(28*28, 100))
-nw.add(ActivationLayerScalar(tanh, tanh_d))
-nw.add(Dense(100, 50))
-nw.add(ActivationLayerScalar(tanh, tanh_d))
-nw.add(Dense(50, 10))
+nw.use(mse, mse_prime, optimizer='nadam', learning_rate=1e-3)
+nw.add(Dense(28*28, 100, initializer_type='xavier'))
+nw.add(ActivationLayerScalar(activation='sigmoid'))
+nw.add(Dense(100, 50, initializer_type='xavier'))
+nw.add(ActivationLayerScalar(activation='sigmoid'))
+nw.add(Dense(50, 10, initializer_type='xavier'))
 nw.add(ActivationLayerVector(softmax, softmax_d))
 
 
-nw.fit(x_train, y_train, x_test, y_test_cat, epochs=100, batch_size=32)
+nw.fit(x_train, y_train, x_test, y_test_cat, epochs=1, batch_size=128)
 
 
-out = nw.predict(x_test[0:3])
+y_test_pred = nw.predict(x_test)
+test_accuracy = accuracy_score(y_test, np.squeeze(y_test_pred))
+
 print("\n")
-print("predicted values : ")
-print(out, end="\n")
-print("true values : ")
-print(y_test[0:3])
+print('Test Set Score ', test_accuracy)

@@ -7,7 +7,6 @@ class WeightInitializer:
     def __init__(self):
         pass
 
-
     def get_initial_weights(self, input_size, output_size, initializer_type='random'):
         if initializer_type == 'random':
             return self.get_weights_random(input_size, output_size)
