@@ -122,11 +122,11 @@ Adding new activations is easy, please add two methods in the ActivationFactory.
 Below is a snippet for ReLU implementation
 
 ```
-#called in forward pass
+#called in forward pass, y=f(x), where x is input to the activation layer and y is the computed output.
 def relu(x, eps=1e-8):
     return np.clip(x, eps, None)
 
-#called in backward pass
+#called in backward pass, calculates del(y)/del(x)
 def relu_d(x, eps=1e-8):
     return np.where(x > 0, 1, eps)
 ```
