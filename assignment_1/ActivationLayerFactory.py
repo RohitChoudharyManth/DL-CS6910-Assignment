@@ -20,12 +20,12 @@ def sigmoid_d(x):
     return np.multiply(sigmoid(x), 1 - sigmoid(x))
 
 
-def relu(x):
-    return np.clip(x, 0, None)
+def relu(x, eps=1e-8):
+    return np.clip(x, eps, None)
 
 
-def relu_d(x):
-    return np.where(x > 0, 1, 0)
+def relu_d(x, eps=1e-8):
+    return np.where(x > 0, 1, eps)
 
 
 def softmax(x, eps=1e-6):

@@ -2,7 +2,7 @@ import copy
 
 from numpy import ndarray
 
-from assignment_1.ActivationLayerFactory import sigmoid, sigmoid_d, tanh, tanh_d
+from assignment_1.ActivationLayerFactory import sigmoid, sigmoid_d, tanh, tanh_d, relu, relu_d
 from assignment_1.BaseLayer import BaseLayer
 import numpy as np
 
@@ -11,6 +11,8 @@ def get_activation_func(activation):
         return sigmoid, sigmoid_d
     elif activation == 'tanh':
         return tanh, tanh_d
+    elif activation == 'relu':
+        return relu, relu_d
     else:
         raise NotImplementedError
 

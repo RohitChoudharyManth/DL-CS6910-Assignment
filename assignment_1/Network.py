@@ -83,4 +83,4 @@ class Network:
 
             y_pred_test = self.predict(x_test)
             test_acc = accuracy_score(np.squeeze(np.argmax(y_test, axis=1)), np.squeeze(y_pred_test))
-            print('epoch %d/%d   train_accuracy=%f' % (i + 1, epochs, test_acc))
+            print('epoch %d/%d   test_accuracy=%f' % (i + 1, epochs, test_acc))
