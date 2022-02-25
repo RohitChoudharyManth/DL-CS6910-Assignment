@@ -61,7 +61,7 @@ sweep_config = {
 
 To replicate results for a particular configuration, changes to the code can be made in the Train.py file. We have made efforts to write code in Keras way
 so adding blocks of layers or activation fuction is very simple. Below is a small snippet of the training code.
-
+```
 nw = Network()
 nw.use(mse, mse_prime, optimizer='nadam', learning_rate=1e-3)
 nw.add(Dense(28*28, 100, initializer_type='xavier'))
@@ -71,7 +71,7 @@ nw.add(ActivationLayerScalar(activation='relu'))
 nw.add(Dense(50, 10, initializer_type='xavier'))
 nw.add(ActivationLayerVector(softmax, softmax_d))
 nw.fit(x_train, y_train, x_test, y_test_cat, epochs=5, batch_size=128)
-
+```
 
 One can add as many layers as they want, Please note structure of Dense layer is as follows Dense(input_neuron_size, output_neuron_size)
 
@@ -81,6 +81,7 @@ Activation function can be changed in the ActivationLayerScalar, by giving eithe
 Adding new activations is easy, please add two methods in the ActivationFactory.py file implementing forward pass and gradient for the activation function. 
 Below is a snippet for ReLU implementation
 
+```
 #called in forward pass
 def relu(x, eps=1e-8):
     return np.clip(x, eps, None)
@@ -88,11 +89,12 @@ def relu(x, eps=1e-8):
 #called in backward pass
 def relu_d(x, eps=1e-8):
     return np.where(x > 0, 1, eps)
-
+```
 
 Similarly, adding new loss functions is easy, please add two methods in the LossFactory.py file implementing loss w.r.t predicted vector and del(Loss)/del(y_pred)
 Below is a snippet for Cross Entropy implementation
 
+```
 #Loss(y_true, y_pred)
 def cross_entropy(y_true, y_pred, eps=1e-8):
     return np.where(y_true == 1, -np.log2(eps + y_pred)/y_true.size, 0).sum()
@@ -100,7 +102,7 @@ def cross_entropy(y_true, y_pred, eps=1e-8):
 #del(Loss)/del(y_pred)
 def cross_entropy_d(y_true, y_pred, eps=1e-8):
     return np.where(y_true == 1, -1/(eps+y_pred), 0)
-
+```
 
 ### Question_1_and_confusion_matrix.py
 
