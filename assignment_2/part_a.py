@@ -75,10 +75,7 @@ def Train_CNN():
         batch_size=config.batch_size,
         # number of images to extract from folder for every batch # Size of the batches of data (default: 32)
         class_mode='sparse')  # classes to predict, "sparse" will be 1D integer labels
-    # shuffle = True) # Whether to shuffle the data (default: True) If set to False, sorts the data in alphanumeric order.
 
-    # seed=2020 # to make the result reproducible
-    # )
 
     validation_gen = train_data.flow_from_directory(
         train_path,
@@ -88,17 +85,14 @@ def Train_CNN():
         batch_size=config.batch_size,  # number of images to extract from folder for every batch
         # Size of the batches of data (default: 32)
         class_mode='sparse')  # classes to predict, "sparse" will be 1D integer labels
-    # shuffle = True) # Whether to shuffle the data (default: True) If set to False, sorts the data in alphanumeric order.
 
-    # seed=2020 # to make the result reproducible
-    # )
 
     test_generator = test_data.flow_from_directory(
         test_path,
         target_size=image_size,  # resize to this size
         batch_size=config.batch_size,  # number of images to extract from folder for every batch
         # Size of the batches of data (default: 32)
-        class_mode='sparse')  # classes to predict, "sparse" will be 1D integer labels
+        class_mode='sparse')
 
     model = models.Sequential()
     if batch_norm_flag:
@@ -143,17 +137,17 @@ def Train_CNN():
     model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=1e-3),
                   loss=[tf.keras.losses.SparseCategoricalCrossentropy()], metrics=['accuracy'])
     model.summary()
-    # H = model.fit(train_gen, epochs=config.epochs, validation_data=validation_gen)
-    # model.save('best_model.h5')
-    # val_acc = 100*max(H.history['val_accuracy'])
+    H = model.fit(train_gen, epochs=config.epochs, validation_data=validation_gen)
+    model.save('best_model.h5')
+    val_acc = 100*max(H.history['val_accuracy'])
 
 
 
-    # params = {'activation': activation_function, 'filter_size': filter_size, 'filter_layer_1': config.filter_1,
-    #           'filter_layer_2': config.filter_2, 'filter_layer_3': config.filter_3, 'filter_layer_4': config.filter_4,
-    #           'filter_layer_5': config.filter_5, 'augmentation': data_augmentation, 'val_acc': val_acc,
-    #           'dense_neuron_count': dense_Neuron_count, 'batch_norm': batch_norm_flag, 'dropout': dropout, 'section': 'Test_Best'}
-    # wandb.log(params)
+    params = {'activation': activation_function, 'filter_size': filter_size, 'filter_layer_1': config.filter_1,
+              'filter_layer_2': config.filter_2, 'filter_layer_3': config.filter_3, 'filter_layer_4': config.filter_4,
+              'filter_layer_5': config.filter_5, 'augmentation': data_augmentation, 'val_acc': val_acc,
+              'dense_neuron_count': dense_Neuron_count, 'batch_norm': batch_norm_flag, 'dropout': dropout, 'section': 'Test_Best'}
+    wandb.log(params)
 
 Train_CNN()
 
