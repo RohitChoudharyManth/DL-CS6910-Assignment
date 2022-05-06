@@ -13,3 +13,10 @@
 *.pyc
 *.jpg
 assignment_2/nature_12K.zip
+*.tsv
+*.gz
+*.txt
+*.yaml
+*.json
+*.log
+*.wandb
