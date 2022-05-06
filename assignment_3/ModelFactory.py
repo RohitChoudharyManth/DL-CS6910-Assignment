@@ -1,22 +1,6 @@
-import os
-import random
-import time
-import wandb
-import re,string
-import numpy as np
 import pandas as pd
-import matplotlib as mpl
-import matplotlib.pyplot as plt
-from matplotlib.font_manager import FontProperties
-from wordcloud import WordCloud, STOPWORDS
-from collections import Counter
-from colour import Color
-from nltk.translate.bleu_score import sentence_bleu, SmoothingFunction
-
 import tensorflow as tf
-from tensorflow.keras import layers
 from tensorflow.keras.layers import LSTM, SimpleRNN, GRU, Embedding, Dense, Flatten
-import tensorflow.keras.backend as K
 from tensorflow.keras.preprocessing.text import Tokenizer
 
 
@@ -171,7 +155,7 @@ class Decoder(tf.keras.Model):
         self.decoder_layer_list = []
         self.attention_flag = attention_flag
         if self.attention_flag:
-            self.attention_layer = Attention()
+            self.attention_layer = Attention(units=self.units)
         self.initialize_decoder()
         self.dense = Dense(vocab_size, activation="softmax")
         self.flatten = Flatten()
