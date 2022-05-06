@@ -202,7 +202,7 @@ sweep_config = {
             "values": ["rnn", "gru", "lstm"]
         },
         "embedding_dim": {
-            "values": [64, 128, 256]
+            "values": [16, 32, 64, 128]
         },
         "enc_dec_layers": {
             "values": [1, 2, 3]
