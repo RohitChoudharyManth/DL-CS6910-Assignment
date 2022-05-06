@@ -1,7 +1,7 @@
 import wandb
 from ModelFactory import *
 import tensorflow as tf
-
+wandb.login(key='677e9fea45b64f0b222413b502a3fbe87ea3b70e')
 
 class Seq2SeqModel(tf.keras.Model):
     def __init__(self, rnn_type, num_encoder_layers, num_decoder_layers, embedding_dim, units,
@@ -155,7 +155,7 @@ class Seq2SeqModel(tf.keras.Model):
                            "val acc": avg_val_acc * 100})
         print("Model trained")
 
-def train_with_wandb(language, test_beam_search=False):
+def train_with_wandb(language):
     config_defaults = {"embedding_dim": 128,
                        "enc_dec_layers": 2,
                        "rnn_type": "lstm",
@@ -165,7 +165,7 @@ def train_with_wandb(language, test_beam_search=False):
                        "teacher_forcing_flag": True
                        }
 
-    wandb.init(config=config_defaults, project="cs6910-assignment3", entity="adi-rohit")
+    run = wandb.init(config=config_defaults, project="cs6910-assignment3", entity="adi-rohit")
 
     TRAIN_TSV, VAL_TSV, TEST_TSV = get_data_files(language)
 
@@ -190,7 +190,6 @@ def train_with_wandb(language, test_beam_search=False):
 
 
 sweep_config = {
-  "name": "Sweep 1- Assignment3",
   "method": "grid",
   "parameters": {
         "enc_dec_layers": {
@@ -220,4 +219,4 @@ sweep_config = {
     }
 }
 sweep_id = wandb.sweep(sweep_config, project="cs6910-assignment3", entity="adi-rohit")
-wandb.agent(sweep_id, project="cs6910-assignment3", function=train_with_wandb("hi"), entity="adi-rohit")
+wandb.agent(sweep_id, project="cs6910-assignment3", function=lambda: train_with_wandb("hi"), entity="adi-rohit")
