@@ -202,13 +202,13 @@ sweep_config = {
             "values": ["rnn", "gru", "lstm"]
         },
         "embedding_dim": {
-            "values": [16, 32, 64, 128]
+            "values": [16]
         },
         "enc_dec_layers": {
             "values": [1, 2, 3]
         },
         "dropout": {
-            "values": [0, 0.1, 0.3]
+            "values": [0]
         },
         "attention_flag": {
             "values": [True, False]
@@ -218,5 +218,20 @@ sweep_config = {
         }
     }
 }
+
+
 sweep_id = wandb.sweep(sweep_config, project="cs6910-assignment3", entity="adi-rohit")
 wandb.agent(sweep_id, project="cs6910-assignment3", function=lambda: train_with_wandb("hi"), entity="adi-rohit")
+
+
+# sweep_config = {
+#   "method": "grid",
+#   "parameters": {
+#         "embedding_dim": {
+#             "values": [16, 32, 64, 128]
+#         },
+#         "dropout": {
+#             "values": [0, 0.1, 0.3]
+#         }
+#     }
+# }
