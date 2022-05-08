@@ -134,7 +134,9 @@ class Encoder(tf.keras.Model):
         output, state = x[0], x[1:]
         return output, state
 
+
     def initialize_hidden_state(self, batch_size):
+        # https: // tiewkh.github.io / blog / gru - hidden - state /
         if self.rnn_type != "lstm":
             return [tf.zeros((batch_size, self.units))]
         else:

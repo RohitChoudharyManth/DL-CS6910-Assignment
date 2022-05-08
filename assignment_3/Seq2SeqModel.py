@@ -155,6 +155,71 @@ class Seq2SeqModel(tf.keras.Model):
                            "val acc": avg_val_acc * 100})
         print("Model trained")
 
+
+
+    def evaluate_model(self, test_dataset, batch_size=None):
+
+        if batch_size is not None:
+            self.batch_size = batch_size
+
+        steps_per_epoch_test = len(test_dataset) // batch_size
+        test_dataset = test_dataset.batch(batch_size, drop_remainder=True)
+
+        total_test_loss = 0
+        total_test_acc = 0
+        self.metric.reset_states()
+
+        enc_state = self.encoder.initialize_hidden_state(self.batch_size)
+
+        for batch, (input, target) in enumerate(test_dataset.take(steps_per_epoch_test)):
+            batch_loss, acc = self.validation_step(input, target, enc_state)
+            total_test_loss += batch_loss
+            total_test_acc += acc
+
+        avg_test_acc = total_test_acc / steps_per_epoch_test
+        avg_test_loss = total_test_loss / steps_per_epoch_test
+
+        print("Test Loss: " + str(avg_test_loss) + "Test Accuracy: " + str(avg_test_acc))
+
+        return avg_test_loss, avg_test_acc
+
+    def translate(self, word, gen_heatmap=False):
+
+        word = "\t" + word + "\n"
+        inputs = self.input_tokenizer.texts_to_sequences([word])
+        inputs = tf.keras.preprocessing.sequence.pad_sequences(inputs,
+                                                               maxlen=self.max_input_len,
+                                                               padding="post")
+        output = ""
+        attention_weights_list = []
+
+        enc_state = self.encoder.initialize_hidden_state(1)
+        enc_out, enc_state = self.encoder(inputs, enc_state)
+
+        dec_state = enc_state
+        dec_input = tf.expand_dims([self.targ_tokenizer.word_index["\t"]] * 1, 1)
+
+        for t in range(1, self.max_target_len):
+
+            preds, dec_state, attention_weights = self.decoder(dec_input, dec_state, enc_out)
+
+            if gen_heatmap:
+                attention_weights_list.append(attention_weights)
+
+            preds = tf.argmax(preds, 1)
+            next_char = self.targ_tokenizer.index_word[preds.numpy().item()]
+            output += next_char
+
+            dec_input = tf.expand_dims(preds, 1)
+
+            if next_char == "\n":
+                return output[:-1], attention_weights_list[:-1]
+
+        return output[:-1], attention_weights_list[:-1]
+
+
+
+
 def train_with_wandb(language):
     config_defaults = {"embedding_dim": 128,
                        "enc_dec_layers": 2,
