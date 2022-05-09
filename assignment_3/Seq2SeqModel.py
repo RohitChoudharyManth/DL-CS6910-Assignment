@@ -103,13 +103,19 @@ class Seq2SeqModel(tf.keras.Model):
                                self.embedding_dim, self.dropout, self.attention_flag)
 
 
-    def fit(self, dataset, val_dataset, batch_size=128, epochs=10):
+    def fit(self, dataset, val_dataset, batch_size=128, epochs=10, log_wandb_flag=True):
         self.batch_size = batch_size
         steps_per_epoch = len(dataset) // self.batch_size
         steps_per_epoch_val = len(val_dataset) // self.batch_size
 
         dataset = dataset.batch(self.batch_size, drop_remainder=True)
         val_dataset = val_dataset.batch(self.batch_size, drop_remainder=True)
+
+        input_lang, target_lang = next(iter(dataset))
+        self.max_target_len = input_lang.shape[1]
+        self.max_input_len = target_lang.shape[1]
+
+
         print("#"*100)
         for epoch in range(1, epochs + 1):
             print(f"EPOCH {epoch}\n")
@@ -147,11 +153,12 @@ class Seq2SeqModel(tf.keras.Model):
             print("train loss: " + str(avg_loss), "train accuracy: " + str(avg_acc * 100), "val loss: " +
                   str(avg_val_loss), "val accuracy: " + str(avg_val_acc * 100))
 
-            # wandb.log({"epoch": epoch,
-            #                "train loss": avg_loss,
-            #                "val loss": avg_val_loss,
-            #                "train acc": avg_acc * 100,
-            #                "val acc": avg_val_acc * 100})
+            if log_wandb_flag:
+                wandb.log({"epoch": epoch,
+                               "train loss": avg_loss,
+                               "val loss": avg_val_loss,
+                               "train acc": avg_acc * 100,
+                               "val acc": avg_val_acc * 100})
         print("Model trained")
 
 
@@ -178,14 +185,14 @@ class Seq2SeqModel(tf.keras.Model):
         avg_test_acc = total_test_acc / steps_per_epoch_test
         avg_test_loss = total_test_loss / steps_per_epoch_test
 
-        print("Test Loss: " + str(avg_test_loss) + "Test Accuracy: " + str(avg_test_acc))
+        print("Test Loss: " + str(avg_test_loss) + "Test Accuracy: " + str(100*avg_test_acc))
 
         return avg_test_loss, avg_test_acc
 
-    def translate(self, word, gen_heatmap=False):
+    def translate(self, word, input_tokenizer, targ_tokenizer, gen_heatmap=False):
 
         word = "\t" + word + "\n"
-        inputs = self.input_tokenizer.texts_to_sequences([word])
+        inputs = input_tokenizer.texts_to_sequences([word])
         inputs = tf.keras.preprocessing.sequence.pad_sequences(inputs,
                                                                maxlen=self.max_input_len,
                                                                padding="post")
@@ -196,17 +203,16 @@ class Seq2SeqModel(tf.keras.Model):
         enc_out, enc_state = self.encoder(inputs, enc_state)
 
         dec_state = enc_state
-        dec_input = tf.expand_dims([self.targ_tokenizer.word_index["\t"]] * 1, 1)
+        dec_input = tf.expand_dims([targ_tokenizer.word_index["\t"]] * 1, 1)
 
         for t in range(1, self.max_target_len):
-
             preds, dec_state, attention_weights = self.decoder(dec_input, dec_state, enc_out)
 
             if gen_heatmap:
                 attention_weights_list.append(attention_weights)
 
             preds = tf.argmax(preds, 1)
-            next_char = self.targ_tokenizer.index_word[preds.numpy().item()]
+            next_char = targ_tokenizer.index_word[preds.numpy().item() if preds.numpy().item() != 0 else 1]
             output += next_char
 
             dec_input = tf.expand_dims(preds, 1)

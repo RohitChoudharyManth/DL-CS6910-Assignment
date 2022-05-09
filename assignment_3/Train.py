@@ -4,10 +4,10 @@ wandb.login(key='677e9fea45b64f0b222413b502a3fbe87ea3b70e')
 
 def train_with_wandb(language):
     config_defaults = {"embedding_dim": 128,
-                       "enc_dec_layers": 2,
-                       "rnn_type": "lstm",
+                       "enc_dec_layers": 1,
+                       "rnn_type": "gru",
                        "units": 512,
-                       "dropout": 0.2,
+                       "dropout": 0.1,
                        "attention_flag": False,
                        "teacher_forcing_flag": True
                        }
@@ -35,49 +35,50 @@ def train_with_wandb(language):
     model.fit(dataset, val_dataset, epochs=30)
 
 
+# sweep_config = {
+#   "method": "grid",
+#   "parameters": {
+#         "enc_dec_layers": {
+#            "values": [1, 2, 3]
+#         },
+#         "units": {
+#             "values": [64, 128, 256, 512]
+#         },
+#         "rnn_type": {
+#             "values": ["gru", "lstm"]
+#         },
+#         "embedding_dim": {
+#             "values": [16]
+#         },
+#         "enc_dec_layers": {
+#             "values": [1, 2, 3]
+#         },
+#         "dropout": {
+#             "values": [0]
+#         },
+#         "attention_flag": {
+#             "values": [False]
+#         },
+#         "teacher_forcing_flag": {
+#             "values": [True, False]
+#         }
+#     }
+# }
+
+
 sweep_config = {
   "method": "grid",
   "parameters": {
-        "enc_dec_layers": {
-           "values": [1, 2, 3]
-        },
-        "units": {
-            "values": [64, 128, 256, 512]
-        },
-        "rnn_type": {
-            "values": ["rnn", "gru", "lstm"]
-        },
         "embedding_dim": {
-            "values": [16]
-        },
-        "enc_dec_layers": {
-            "values": [1, 2, 3]
+            "values": [16, 32, 64, 128]
         },
         "dropout": {
-            "values": [0]
-        },
-        "attention_flag": {
-            "values": [False]
-        },
-        "teacher_forcing_flag": {
-            "values": [True, False]
+            "values": [0, 0.1, 0.3]
         }
     }
 }
-
 
 sweep_id = wandb.sweep(sweep_config, project="cs6910-assignment3", entity="adi-rohit")
 wandb.agent(sweep_id, project="cs6910-assignment3", function=lambda: train_with_wandb("hi"), entity="adi-rohit")
 
 
-# sweep_config = {
-#   "method": "grid",
-#   "parameters": {
-#         "embedding_dim": {
-#             "values": [16, 32, 64, 128]
-#         },
-#         "dropout": {
-#             "values": [0, 0.1, 0.3]
-#         }
-#     }
-# # }
