@@ -99,7 +99,7 @@ class Attention(tf.keras.layers.Layer):
     def call(self, enc_state, enc_out):
         enc_state = tf.concat(enc_state, 1)
         enc_state = tf.expand_dims(enc_state, 1)
-        print(enc_state.shape, enc_out.shape)
+        # print(enc_state.shape, enc_out.shape)
         attention_score = self.V(tf.nn.tanh(self.U(enc_state) + self.W(enc_out)))
         attention_weights = tf.nn.softmax(attention_score, axis=1)
         context_vector = attention_weights * enc_out

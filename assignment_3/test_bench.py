@@ -15,7 +15,8 @@ model = Seq2SeqModel(embedding_dim=128,
                      rnn_type="gru",
                      units=512,
                      dropout=0.1,
-                     attention_flag=True)
+                     attention_flag=True,
+                     teacher_forcing_flag=True)
 
 model.set_vocabulary(input_tokenizer, targ_tokenizer)
 model.build(loss=tf.keras.losses.SparseCategoricalCrossentropy(),
