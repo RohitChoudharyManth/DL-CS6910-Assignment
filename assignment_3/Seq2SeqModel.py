@@ -218,15 +218,13 @@ class Seq2SeqModel(tf.keras.Model):
         return output[:-1], attention_weights_list[:-1]
 
 
-
-
 def train_with_wandb(language):
     config_defaults = {"embedding_dim": 128,
                        "enc_dec_layers": 2,
                        "rnn_type": "lstm",
                        "units": 512,
                        "dropout": 0.2,
-                       "attention_flag": True,
+                       "attention_flag": False,
                        "teacher_forcing_flag": True
                        }
 
@@ -252,7 +250,7 @@ def train_with_wandb(language):
     model.fit(dataset, val_dataset, epochs=30)
 
 
-
+# train_with_wandb("hi")
 
 sweep_config = {
   "method": "grid",
@@ -276,7 +274,7 @@ sweep_config = {
             "values": [0]
         },
         "attention_flag": {
-            "values": [True, False]
+            "values": [False]
         },
         "teacher_forcing_flag": {
             "values": [True, False]

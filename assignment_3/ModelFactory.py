@@ -1,6 +1,6 @@
 import pandas as pd
 import tensorflow as tf
-from tensorflow.keras.layers import LSTM, SimpleRNN, GRU, Embedding, Dense, Flatten
+from tensorflow.keras.layers import LSTM, SimpleRNN, GRU, Embedding, Dense, Flatten, LayerNormalization, MultiHeadAttention, Dropout, Conv1D
 from tensorflow.keras.preprocessing.text import Tokenizer
 
 
@@ -99,11 +99,37 @@ class Attention(tf.keras.layers.Layer):
     def call(self, enc_state, enc_out):
         enc_state = tf.concat(enc_state, 1)
         enc_state = tf.expand_dims(enc_state, 1)
+        print(enc_state.shape, enc_out.shape)
         attention_score = self.V(tf.nn.tanh(self.U(enc_state) + self.W(enc_out)))
         attention_weights = tf.nn.softmax(attention_score, axis=1)
         context_vector = attention_weights * enc_out
         context_vector = tf.reduce_sum(context_vector, axis=1)
         return context_vector, attention_weights
+
+
+
+
+
+class ScaledDotProductAttention(tf.keras.layers.Layer):
+    def __init__(self, units):
+        super(ScaledDotProductAttention, self).__init__()
+        self.units = units
+    # state is the query, key and value come from the encoder output
+
+    def transformer_encoder(self, enc_state, enc_out):
+        # Normalization and Attention
+        x, attention_score = MultiHeadAttention(
+            key_dim=self.units, num_heads=4, dropout=0.2)(enc_state, enc_out, return_attention_scores=True)
+        return x, attention_score
+
+
+    def call(self, enc_state, enc_out):
+        enc_state = tf.concat(enc_state, 1)
+        enc_state = tf.expand_dims(enc_state, 1)
+        context_vector, attention_weights = self.transformer_encoder(enc_state=enc_state, enc_out=enc_out)
+        return context_vector, attention_weights
+
+
 
 
 
@@ -171,13 +197,14 @@ class Decoder(tf.keras.Model):
 
     def call(self, x, hidden, enc_out=None):
         x = self.embedding(x)
-
         '''
         Use the context vector(mixture of encoder outputs as the input for the first layer of the decoder)
         '''
         if self.attention_flag:
             context_vector, attention_weights = self.attention_layer(hidden, enc_out)
             x = tf.concat([tf.expand_dims(context_vector, 1), x], -1)
+            # print(context_vector.shape, x.shape)
+            # x = tf.concat([context_vector, x], -1)
         else:
             attention_weights = None
 
